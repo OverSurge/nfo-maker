@@ -15,7 +15,6 @@ class Category:
         return max(len(self.name)+2, max([len(x) for x in self.lines]))
 
     def __repr__(self):
-        print(len(self), len(self.name))
         fill = (len(self) - len(self.name)) // 2 * self.filler
         res = fill + self.name + fill + "\n"
         for line in self.lines:
