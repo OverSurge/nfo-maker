@@ -1,4 +1,5 @@
 import unittest
+
 from NFO import NFO
 from Category import Category
 from Line import Line
@@ -14,5 +15,6 @@ class CategoryPrint(unittest.TestCase):
         cat.add_line(l1)
         cat.add_line(l2)
         self.assertEqual(len(cat), 19)
-        nfo = NFO(cat)
+        nfo = NFO("Windows 7 DVD", cat)
         print(nfo)
+        nfo.write()
