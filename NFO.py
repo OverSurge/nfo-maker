@@ -4,7 +4,7 @@ from Category import Category
 
 
 class NFO:
-    def __init__(self, name, categories=None):
+    def __init__(self, name: str="Unnamed", categories=None):
         self.name = name
         if categories is None:
             self.categories = []
