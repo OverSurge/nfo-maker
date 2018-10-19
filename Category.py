@@ -2,10 +2,10 @@ from Line import Line
 
 
 class Category:
-    filler = "="
+    filler = '='
 
     def __init__(self, name: str, lines: list=None):
-        self.name = " " + name + " "
+        self.name = ' ' + name + ' '
         if lines is None:
             self.lines = []
         else:
@@ -16,10 +16,10 @@ class Category:
 
     def __repr__(self):
         fill = (len(self) - len(self.name)) // 2 * self.filler
-        res = fill + self.name + fill + "\n"
+        res = fill + self.name + fill + '\n'
         for line in self.lines:
 
-            res = res + str(line) + "\n"
+            res = res + str(line) + '\n'
         return res
 
     def add_line(self, line: Line):

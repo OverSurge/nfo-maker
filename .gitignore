@@ -1,1 +1,8 @@
+__pycache__
 .idea
+build
+dist
+tests
+
+*.nfo
+*.spec
