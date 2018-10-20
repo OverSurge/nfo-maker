@@ -17,4 +17,4 @@ class CategoryPrint(unittest.TestCase):
         self.assertEqual(len(cat), 19)
         nfo = NFO('Windows 7 DVD', cat)
         print(nfo)
-        nfo.write()
+        nfo.save()

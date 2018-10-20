@@ -1,5 +1,3 @@
-import os
-
 from pathlib import Path
 
 from Category import Category
@@ -14,6 +12,19 @@ class NFO:
             self.ctgs = ctgs
         else:
             self.ctgs = [ctgs]
+        self._path = None
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, path):
+        if path is not None:
+            if isinstance(path, Path):
+                self._path = path
+            elif isinstance(path, str):
+                self._path = Path(path)
 
     def __repr__(self):
         res = self.name + '\n\n'
@@ -24,17 +35,19 @@ class NFO:
     def add_ctg(self, ctg: Category):
         self.ctgs.append(ctg)
 
-    def write(self, path=None):
-        if path is None:
-            path = Path('.' + '/' + self.name + '.nfo').absolute()
-        elif path[-4:] != '.nfo':
-            path += '.nfo'
-        out = open(path, 'w+')
-        out.write(str(self))
-        out.close()
-        return '.nfo written at {}'.format(path)
+    def is_valid(self):
+        if len(self.ctgs) > 0:
+            return True
+        else:
+            raise Exception('NoCtg')
 
     def move_ctg(self, ctg: Category, direction: str):
         i = self.ctgs.index(ctg)
         if direction == 'up' and i != 0:
             self.ctgs[i], self.ctgs[i+1] = self.ctgs[i+1], self.ctgs[i]
+
+    def save(self):
+        out = open(self.path, 'w+')
+        out.write(str(self))
+        out.close()
+        print('.nfo written at {}'.format(self.path))
