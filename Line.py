@@ -1,7 +1,4 @@
 class Line:
-    names = ["Titre", "Date de sortie", "Protection", "Disque", "Genre", "Plateforme", "Langue Audio", "Langue Texte",
-             "Système d'Exploitation", "Processeur", "Mémoire Vive", "Carte Graphique", "Version DirectX", ""]
-
     def __init__(self, name: str='', value: str=''):
         self.name = name
         self.value = value

@@ -4,8 +4,8 @@ from Category import Category
 
 
 class NFO:
-    def __init__(self, name: str='Unnamed', ctgs=None):
-        self.name = name
+    def __init__(self, name: str, ctgs=None):
+        self.name = 'Unnamed NFO' if name == '' else name
         if ctgs is None:
             self.ctgs = []
         elif isinstance(ctgs, list):
@@ -28,18 +28,45 @@ class NFO:
 
     def __repr__(self):
         res = self.name + '\n\n'
-        for cat in self.ctgs:
-            res += str(cat)
+        for ctg in self.ctgs:
+            res += str(ctg)
         return res
 
     def add_ctg(self, ctg: Category):
         self.ctgs.append(ctg)
+
+    def del_ctg(self, index: int):
+        if 1 <= index <= len(self.ctgs):
+            name = self.ctgs[index-1].name
+            if input('Are you sure to delete category "{}" ? (Y/n)\n> '.format(name)).lower() == 'y':
+                self.ctgs.pop(index-1)
+                print('Deleted category "{}"'.format(name))
+            else:
+                print('Canceled deletion.')
+        else:
+            raise IndexError
+
+    def ren_ctg(self, index: int, new_name: str=''):
+        if 1 <= index <= len(self.ctgs):
+            name = self.ctgs[index-1].name
+            if new_name == '':
+                self.ctgs[index-1].name = input('Enter a new name for category "{}" :\n> '.format(name))
+            else:
+                self.ctgs[index].name = new_name
+        else:
+            raise IndexError
 
     def is_valid(self):
         if len(self.ctgs) > 0:
             return True
         else:
             raise Exception('NoCtg')
+
+    def list_ctgs(self):
+        res = ''
+        for i in range(len(self.ctgs)):
+            res += '{}: {}\n'.format(str(i+1).rjust(2), str(self.ctgs[i]).split('\n', 1)[0])
+        return res
 
     def move_ctg(self, ctg: Category, direction: str):
         i = self.ctgs.index(ctg)
