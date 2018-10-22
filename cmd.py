@@ -1,19 +1,25 @@
 import os
-
 from pathlib import Path
-
 from NFO import NFO
 
-cmds = [{'h': 'Show this help / command list', 'q': 'Quit', 'p': 'Print .nfo', 's': 'Save .nfo'},
-        {'ac': 'Add a category', 'dc': 'Delete a category', 'mc': 'Move a category', 'rc': 'Rename a category'}]
+VERSION = '1.0.5'
+cmds = [{'h': 'show this Help / command list', 'q': 'Quit', 'p': 'Print .nfo', 's': 'Save .nfo'},
+        {'ac': 'Add a Category', 'dc': 'Delete a Category', 'mc': 'Move a Category', 'rc': 'Rename a Category'},
+        {'al': 'Add a Line to a category', 'dl': 'Delete a Line', 'ml': 'Move a Line inside a category',
+         'mlc': 'Move a Line to another Category'}]
 
 
 def available_cmds(nfo):
     res = ['h', 'q', 'p', 's', 'ac']
-    if len(nfo.ctgs) > 0:
-        res.extend(['dc', 'rc'])
-    if len(nfo.ctgs) > 1:
+    nb_ctgs = len(nfo.ctgs)
+    if nb_ctgs > 0:
+        res.extend(['dc', 'rc', 'al'])
+    if nb_ctgs > 1:
         res.append('mc')
+    if nfo.contains_line():
+        res.extend(['dl', 'ml'])
+        if nb_ctgs > 1:
+            res.append('mlc')
     return res
 
 
@@ -39,15 +45,17 @@ def cls():
 
 def print_cmds(nfo: NFO):
     available = available_cmds(nfo)
-    res = '----------- Commands ------------\n'
+    res = '------------ Commands -----------\n'
     for cmd_type in cmds:
+        lf = False
         for (cmd, desc) in cmd_type.items():
             if cmd in available:
                 res += cmd.ljust(4) + desc + '\n'
-        res += '\n'
-    print(res[:-1])
+                lf = True
+        res += '\n' if lf else ''
+    print(res[:-1] + '---------------------------------')
 
 
 def print_nfo(nfo: NFO):
     cls()
-    print(str(nfo))
+    print(str(nfo) + '\n')

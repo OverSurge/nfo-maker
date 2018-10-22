@@ -1,30 +1,25 @@
 import cmd
-
 from NFO import NFO
 
 
 def main() -> None:
     try:
         cmd.cls()
-        print('NFO Maker cli v1.0.4\n')
+        print('NFO Maker CLI v{}\n'.format(cmd.VERSION))
         nfo = NFO()
         cmd.cls()
         cmd.print_cmds(nfo)
         while True:
+            action = input('> ')
+            cmd.cls()
             try:
-                action = input('> ')
-                cmd.cls()
                 if action in cmd.available_cmds(nfo):
                     if action == '?' or action == 'h':
                         cmd.print_cmds(nfo)
 
                     elif action == 'q':
-                        cmd.cls()
                         print('Exiting NFO Maker CLI.')
                         break
-
-                    elif action == 'p':
-                        cmd.print_nfo(nfo)
 
                     elif action == 's':
                         if nfo.is_valid():
@@ -32,24 +27,22 @@ def main() -> None:
 
                     elif action == 'ac':
                         nfo.add_ctg()
-                        cmd.print_nfo(nfo)
-                        cmd.print_cmds(nfo)
 
                     elif action == 'dc':
                         nfo.del_ctg()
-                        cmd.print_nfo(nfo)
 
                     elif action == 'mc':
                         nfo.move_ctg()
-                        cmd.print_nfo(nfo)
-                        cmd.print_cmds(nfo)
 
                     elif action == 'rc':
                         nfo.ren_ctg()
-                        cmd.print_nfo(nfo)
 
+                    elif action == 'al':
+                        nfo.add_line()
+
+                    if action in ['p', 'ac', 'dc', 'mc', 'rc', 'al']:
+                        cmd.print_nfo(nfo)
                 else:
-                    cmd.cls()
                     cmd.print_cmds(nfo)
             except EOFError:
                 cmd.cls()

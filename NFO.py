@@ -1,11 +1,10 @@
-import typing
 from pathlib import Path
-
 from Category import Category
+from Line import Line
 
 
 class NFO:
-    def __init__(self, name: str=None, ctgs=None):
+    def __init__(self, name: str=None, ctgs: Category=None):
         if name is None:
             name = input('Enter a title (name) for your .nfo :\n> ')
             self.name = 'Unnamed NFO' if name == '' else name
@@ -18,9 +17,9 @@ class NFO:
         self._path = None
 
     def __repr__(self):
-        res = self.name + '\n\n'
+        res = self.name
         for ctg in self.ctgs:
-            res += str(ctg)
+            res = res + '\n\n' + str(ctg)
         return res
 
     @property
@@ -35,9 +34,9 @@ class NFO:
             elif isinstance(path, str):
                 self._path = Path(path)
 
-    def add_ctg(self, ctg: typing.Union[Category, str]=None) -> None:
+    def add_ctg(self, ctg=None) -> None:
         if ctg is None:
-            self.ctgs.append(Category(input('Enter new category name :\n> ')))
+            self.ctgs.append(Category(input('Enter the new category\'s name :\n> ')))
         elif isinstance(ctg, Category):
             self.ctgs.append(ctg)
         elif isinstance(ctg, str):
@@ -97,6 +96,17 @@ class NFO:
             return index - 1
         else:
             raise IndexError
+
+    def add_line(self, index: int=None, line: Line=None):
+        if index is None:
+            index = self.sel_ctg() if len(self.ctgs) != 1 else 0
+        self.ctgs[index].add_line(line)
+
+    def contains_line(self):
+        for ctg in self.ctgs:
+            if len(ctg.lines) > 0:
+                return True
+        return False
 
     def is_valid(self) -> bool:
         if len(self.ctgs) > 0:
