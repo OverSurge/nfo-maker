@@ -1,11 +1,14 @@
+import typing
 from pathlib import Path
 
 from Category import Category
 
 
 class NFO:
-    def __init__(self, name: str, ctgs=None):
-        self.name = 'Unnamed NFO' if name == '' else name
+    def __init__(self, name: str=None, ctgs=None):
+        if name is None:
+            name = input('Enter a title (name) for your .nfo :\n> ')
+            self.name = 'Unnamed NFO' if name == '' else name
         if ctgs is None:
             self.ctgs = []
         elif isinstance(ctgs, list):
@@ -13,6 +16,12 @@ class NFO:
         else:
             self.ctgs = [ctgs]
         self._path = None
+
+    def __repr__(self):
+        res = self.name + '\n\n'
+        for ctg in self.ctgs:
+            res += str(ctg)
+        return res
 
     @property
     def path(self):
@@ -26,54 +35,76 @@ class NFO:
             elif isinstance(path, str):
                 self._path = Path(path)
 
-    def __repr__(self):
-        res = self.name + '\n\n'
-        for ctg in self.ctgs:
-            res += str(ctg)
+    def add_ctg(self, ctg: typing.Union[Category, str]=None) -> None:
+        if ctg is None:
+            self.ctgs.append(Category(input('Enter new category name :\n> ')))
+        elif isinstance(ctg, Category):
+            self.ctgs.append(ctg)
+        elif isinstance(ctg, str):
+            self.ctgs.append(Category(ctg))
+        else:
+            raise TypeError
+
+    def del_ctg(self, index: int=None) -> None:
+        if index is None:
+            index = self.sel_ctg() if len(self.ctgs) != 1 else 0
+        name = self.ctgs[index].name
+        if input('Are you sure to delete category "{}" ? (Y/n)\n> '.format(name)).lower() == 'y':
+            self.ctgs.pop(index)
+            print('Deleted category "{}"'.format(name))
+        else:
+            print('Canceled deletion.')
+
+    def list_ctgs(self) -> str:
+        res = ''
+        for i in range(len(self.ctgs)):
+            res += '{}: {}\n'.format(str(i + 1).rjust(2), str(self.ctgs[i]).split('\n', 1)[0])
         return res
 
-    def add_ctg(self, ctg: Category):
-        self.ctgs.append(ctg)
-
-    def del_ctg(self, index: int):
-        if 1 <= index <= len(self.ctgs):
-            name = self.ctgs[index-1].name
-            if input('Are you sure to delete category "{}" ? (Y/n)\n> '.format(name)).lower() == 'y':
-                self.ctgs.pop(index-1)
-                print('Deleted category "{}"'.format(name))
+    def move_ctg(self, index: int=None, direction: str=None) -> None:
+        index = self.sel_ctg() if index is None else index
+        if direction is None:
+            while direction != 'up' and direction != 'down':
+                direction = input('Enter "up" or "down" to move category :\n> ')
+        if direction == 'up':
+            if index == 0:
+                self.ctgs.append(self.ctgs[0])
+                self.ctgs.pop(0)
             else:
-                print('Canceled deletion.')
+                self.ctgs[index-1], self.ctgs[index] = self.ctgs[index], self.ctgs[index-1]
+        elif direction == 'down':
+            if index == len(self.ctgs) - 1:
+                self.ctgs.insert(0, self.ctgs[-1])
+                self.ctgs.pop()
+            else:
+                self.ctgs[index], self.ctgs[index+1] = self.ctgs[index+1], self.ctgs[index]
         else:
             raise IndexError
 
-    def ren_ctg(self, index: int, new_name: str=''):
+    def ren_ctg(self, index: int=None, new_name: str=None) -> None:
+        if index is None:
+            index = self.sel_ctg() if len(self.ctgs) != 1 else 0
+        name = self.ctgs[index].name
+        if new_name is None:
+            self.ctgs[index].name = input('Enter a new name for category "{}" :\n> '.format(name))
+        else:
+            self.ctgs[index].name = new_name
+
+    def sel_ctg(self) -> int:
+        print(self.list_ctgs())
+        index = int(input('Enter category number :\n> '))
         if 1 <= index <= len(self.ctgs):
-            name = self.ctgs[index-1].name
-            if new_name == '':
-                self.ctgs[index-1].name = input('Enter a new name for category "{}" :\n> '.format(name))
-            else:
-                self.ctgs[index].name = new_name
+            return index - 1
         else:
             raise IndexError
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if len(self.ctgs) > 0:
             return True
         else:
             raise Exception('NoCtg')
 
-    def list_ctgs(self):
-        res = ''
-        for i in range(len(self.ctgs)):
-            res += '{}: {}\n'.format(str(i+1).rjust(2), str(self.ctgs[i]).split('\n', 1)[0])
-        return res
-
-    def move_ctg(self, ctg: Category, direction: str):
-        i = self.ctgs.index(ctg)
-        if direction == 'up' and i != 0:
-            self.ctgs[i], self.ctgs[i+1] = self.ctgs[i+1], self.ctgs[i]
-
-    def save(self):
+    def save(self) -> None:
         out = open(self.path, 'w+')
         out.write(str(self))
         out.close()
