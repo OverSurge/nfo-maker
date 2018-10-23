@@ -114,6 +114,13 @@ class NFO:
         else:
             raise Exception('NoCtg')
 
+    def rename(self, name: str=None):
+        if name is None:
+            name = input('Enter a new .nfo name :\n> ')
+            self.name = 'Unnamed NFO' if name == '' else name
+        else:
+            self.name = name
+
     def save(self) -> None:
         out = open(self.path, 'w+')
         out.write(str(self))

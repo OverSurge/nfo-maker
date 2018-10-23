@@ -14,12 +14,15 @@ def main() -> None:
             cmd.cls()
             try:
                 if action in cmd.available_cmds(nfo):
-                    if action == '?' or action == 'h':
+                    if action == 'h':
                         cmd.print_cmds(nfo)
 
                     elif action == 'q':
                         print('Exiting NFO Maker CLI.')
                         break
+
+                    elif action == 'r':
+                        nfo.rename()
 
                     elif action == 's':
                         if nfo.is_valid():
@@ -40,7 +43,7 @@ def main() -> None:
                     elif action == 'al':
                         nfo.add_line()
 
-                    if action in ['p', 'ac', 'dc', 'mc', 'rc', 'al']:
+                    if action in ['r', 'p', 'ac', 'dc', 'mc', 'rc', 'al']:
                         cmd.print_nfo(nfo)
                 else:
                     cmd.print_cmds(nfo)

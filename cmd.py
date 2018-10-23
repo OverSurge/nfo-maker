@@ -2,15 +2,15 @@ import os
 from pathlib import Path
 from NFO import NFO
 
-VERSION = '1.0.5'
-cmds = [{'h': 'show this Help / command list', 'q': 'Quit', 'p': 'Print .nfo', 's': 'Save .nfo'},
+VERSION = '1.0.6'
+cmds = [{'h': 'show this Help / command list', 'q': 'Quit', 'r': 'Rename .nfo', 'p': 'Print .nfo', 's': 'Save .nfo'},
         {'ac': 'Add a Category', 'dc': 'Delete a Category', 'mc': 'Move a Category', 'rc': 'Rename a Category'},
         {'al': 'Add a Line to a category', 'dl': 'Delete a Line', 'ml': 'Move a Line inside a category',
          'mlc': 'Move a Line to another Category'}]
 
 
 def available_cmds(nfo):
-    res = ['h', 'q', 'p', 's', 'ac']
+    res = ['h', 'q', 'r', 'p', 's', 'ac']
     nb_ctgs = len(nfo.ctgs)
     if nb_ctgs > 0:
         res.extend(['dc', 'rc', 'al'])
