@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from NFO import NFO
 
-VERSION = '1.0.6'
+VERSION = '1.0.7'
 cmds = [{'h': 'show this Help / command list', 'q': 'Quit', 'r': 'Rename .nfo', 'p': 'Print .nfo', 's': 'Save .nfo'},
         {'ac': 'Add a Category', 'dc': 'Delete a Category', 'mc': 'Move a Category', 'rc': 'Rename a Category'},
         {'al': 'Add a Line to a category', 'dl': 'Delete a Line', 'ml': 'Move a Line inside a category',
@@ -58,4 +58,4 @@ def print_cmds(nfo: NFO):
 
 def print_nfo(nfo: NFO):
     cls()
-    print(str(nfo) + '\n')
+    print(nfo)

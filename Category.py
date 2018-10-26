@@ -1,3 +1,4 @@
+import NFO
 from Line import Line
 
 
@@ -19,7 +20,7 @@ class Category:
         return max(len(self.name)+4, max([len(x) for x in self.lines]))
 
     def __repr__(self):
-        width = len(self)
+        width = NFO.NFO.nfo.width()
         if (width % 2 == 0 and len(self.name) % 2 == 0) or (width % 2 != 0 and len(self.name) % 2 != 0):
             res = '{0} {1} {0}'.format((width - len(self.name) - 2) // 2 * self.filler, self.name)
         else:

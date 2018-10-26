@@ -3,7 +3,20 @@ from Category import Category
 from Line import Line
 
 
+def singleton(cls, *args, **kw):
+    instances = {}
+
+    def _singleton():
+        if cls not in instances:
+            instances[cls] = cls(*args, **kw)
+        return instances[cls]
+    return _singleton
+
+
+@singleton
 class NFO:
+    nfo = None
+
     def __init__(self, name: str=None, ctgs: Category=None):
         if name is None:
             name = input('Enter a title (name) for your .nfo :\n> ')
@@ -15,12 +28,13 @@ class NFO:
         else:
             self.ctgs = [ctgs]
         self._path = None
+        NFO.nfo = self
 
     def __repr__(self):
         res = self.name
         for ctg in self.ctgs:
             res = res + '\n\n' + str(ctg)
-        return res
+        return res + '\n'
 
     @property
     def path(self):
@@ -126,3 +140,6 @@ class NFO:
         out.write(str(self))
         out.close()
         print('.nfo written at {}'.format(self.path))
+
+    def width(self):
+        return max([len(x) for x in self.ctgs])
