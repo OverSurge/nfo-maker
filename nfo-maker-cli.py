@@ -24,9 +24,11 @@ def main() -> None:
                     elif action == 'r':
                         nfo.rename()
 
+                    elif action == 'p':
+                        cmd.print_nfo(nfo)
+
                     elif action == 's':
-                        if nfo.is_valid():
-                            nfo.save() if cmd.choose_path(nfo) else print('Canceled writing.')
+                        nfo.save() if cmd.choose_path(nfo) else print('Canceled writing.')
 
                     elif action == 'ac':
                         nfo.add_ctg()
@@ -43,11 +45,24 @@ def main() -> None:
                     elif action == 'al':
                         nfo.add_line()
 
-                    if action in ['r', 'p', 'ac', 'dc', 'mc', 'rc', 'al']:
+                    elif action == 'dl':
+                        nfo.del_line()
+
+                    elif action == 'ml':
+                        nfo.move_line()
+
+                    elif action == 'mlc':
+                        nfo.move_line_to_ctg()
+
+                    elif action == 'rl':
+                        nfo.ren_line()
+
+                    if action in ['r', 'ac', 'dc', 'mc', 'rc', 'al', 'dl', 'ml', 'mlc', 'rl']:
                         cmd.print_nfo(nfo)
+                        cmd.print_cmds(nfo)
                 else:
                     cmd.print_cmds(nfo)
-            except EOFError:
+            except (EOFError, IndexError, ValueError):
                 cmd.cls()
                 cmd.print_cmds(nfo)
             except KeyboardInterrupt:
