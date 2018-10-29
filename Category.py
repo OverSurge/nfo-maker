@@ -1,3 +1,19 @@
+# NFO Maker
+# Copyright (C) 2018  OverSurge
+# 
+# NFO Maker is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# NFO Maker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NFO Maker.  If not, see <https://www.gnu.org/licenses/>.
+
 import typing
 import NFO
 from Line import Line
@@ -7,6 +23,7 @@ class Category:
     count = 1
 
     def __init__(self, name: str='', lines: typing.List[Line]=None) -> None:
+        name = name.replace('=', '')
         self.name = 'Category ' + str(Category.count) if name == '' else name
         Category.count += 1
         if lines is None:
@@ -20,20 +37,24 @@ class Category:
         return max(len(self.name)+4, max([len(x) for x in self.lines]))
 
     def __repr__(self) -> str:
-        width = NFO.nfo.width()
+        width = NFO.NFO.width()
         if (width % 2 == 0 and len(self.name) % 2 == 0) or (width % 2 != 0 and len(self.name) % 2 != 0):
-            res = '{0} {1} {0}'.format((width - len(self.name) - 2) // 2 * NFO.filler, self.name)
+            res = '{0} {1} {0}'.format((width - len(self.name) - 2) // 2 * '=', self.name)
         else:
-            res = '{0} {1} {2}'.format((width - len(self.name)) // 2 * NFO.filler, self.name,
-                                       ((width - len(self.name)) // 2 - 1) * NFO.filler)
+            res = '{0} {1} {2}'.format((width - len(self.name)) // 2 * '=', self.name,
+                                       ((width - len(self.name)) // 2 - 1) * '=')
         for line in self.lines:
             res = res + '\n' + str(line)
         return res
 
     def add_line(self, line: Line=None) -> None:
         if line is None:
-            name = input('Enter the new line\'s name :\n> ')
-            value = input('Enter the value of "{}" :\n> '.format(name))
+            name = input('Enter the new line\'s name\n> ')
+            if name == '':
+                name = 'Line ' + str(Line.count)
+            elif name[0] == '=':
+                name = name[1:]
+            value = input('Enter the value of "{}"\n> '.format(name))
             self.lines.append(Line(name, value))
         elif isinstance(line, Line):
             self.lines.append(line)
@@ -68,7 +89,7 @@ class Category:
             index = self.sel_line() if index is None else index
             if direction is None:
                 while direction != 'up' and direction != 'down':
-                    direction = input('Enter "up" or "down" to move line :\n> ')
+                    direction = input('Enter "up" or "down" to move line\n> ')
             if direction == 'up':
                 if index == 0:
                     self.lines.append(self.lines[0])
@@ -89,9 +110,9 @@ class Category:
             index = self.sel_line()
         if new_name is None or new_value is None:
             name = self.lines[index].name
-            new_name = input('Enter a new name for "{}" :\n> '.format(name))
+            new_name = input('Enter a new name for "{}"\n> '.format(name))
             self.lines[index].name = new_name if new_name != '' else self.lines[index].name
-            new_value = input('Enter a new value for "{}" :\n> '.format(self.lines[index].name))
+            new_value = input('Enter a new value for "{}"\n> '.format(self.lines[index].name))
             self.lines[index].value = new_value if new_value != '' else self.lines[index].value
         else:
             self.lines[index].name = new_name
@@ -102,7 +123,7 @@ class Category:
             return 0
         else:
             print(self.list_lines())
-            index = int(input('Enter line number :\n> '))
+            index = int(input('Enter line number\n> '))
             if 1 <= index <= len(self.lines):
                 return index - 1
             else:
