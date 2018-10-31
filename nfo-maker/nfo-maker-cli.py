@@ -20,6 +20,8 @@ import os
 import commands
 from NFO import NFO
 
+VERSION = '1.2.0'
+
 
 def cls() -> None:
     """Clear the terminal."""
@@ -31,11 +33,9 @@ def main() -> None:
         cls()
         mode = input('┌──────────────────────────┐\n│   NFO Maker CLI v{}   │\n└╥─────────────────────────┘\n ║\n'
                      ' ╠ n: Create a new .nfo\n ║\n ╠ l: Load an existing .nfo\n ║\n ╚ q: Quit\n\n> '
-                     .format(commands.VERSION))
+                     .format(VERSION))
         cls()
-        if mode == 'n':
-            NFO()
-        elif mode == 'l':
+        if mode == 'l':
             loaded = False
             while not loaded:
                 try:
@@ -46,6 +46,8 @@ def main() -> None:
         elif mode == 'q':
             print('Exiting NFO Maker CLI.')
             return
+        else:
+            NFO()
         cls()
         print(NFO)
         commands.print_commands()

@@ -14,14 +14,18 @@ Otherwise, run `nfo-maker/nfo-maker-cli.py` with Python 3.
 ```
 Example
 
-========== General Informations ==========
+============== General Information ==============
 Release Date : 01/01/2018
-Audio : English / Japanese
+Audio        : English / Japanese
 
-============== Requirements ==============
-OS : Windows 7 +
-CPU : Intel Core 2 Duo / Athlon 64 X2 6400
-RAM : 2 GB
+================== Requirements =================
+OS         : Windows 7 +
+CPU        : Intel Core 2 Duo / Athlon 64 X2 6400
+RAM        : 2 GB
+Connection : Broadband Internet connection
+
+=================================================
+Empty Category name : Enabled
 ```
 
 ## License

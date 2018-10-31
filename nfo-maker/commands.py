@@ -17,7 +17,6 @@
 import typing
 from NFO import NFO
 
-VERSION = '1.1.0'
 commands = [{'h': 'show this Help / command list', 'q': 'Quit', 'r': 'Rename .nfo', 'p': 'Print .nfo', 's': 'Save .nfo',
             'l': 'Load .nfo'},
             {'ac': 'Add a Category', 'dc': 'Delete a Category', 'mc': 'Move a Category', 'rc': 'Rename a Category'},

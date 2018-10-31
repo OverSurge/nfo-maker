@@ -22,19 +22,26 @@ from Line import Line
 class Category:
     count = 1
 
-    def __init__(self, name: str='', lines: typing.List[Line]=None) -> None:
+    def __init__(self, name: typing.Union[str, None]='', lines: typing.List[Line]=None) -> None:
         """A Category is defined by a name and a list of Line.
 
-        :param name: Should not contain an '='
+        :param name: Should not contain an '='. If None, will be empty. If '', will ask user to type a name
         :param lines:
         """
-        name = name.replace('=', '')
-        self.name = 'Category ' + str(Category.count) if name == '' else name
-        Category.count += 1
+        if name is None:
+            self.name = ''
+        elif name == '':
+            if input('Create an unnamed category ? (Y/n)\n> ').upper() == 'N':
+                self.name = 'Category ' + str(Category.count)
+            else:
+                self.name = ''
+        else:
+            self.name = name.replace('=', '')[:NFO.NFO.max_width - 4]
         if lines is None:
             self.lines = []
         else:
             self.lines = lines
+        Category.count += 1
 
     def __len__(self) -> int:
         """The length of a Category's title is the length of its name + 4 because there is at least 2 '=' and 2 spaces
@@ -47,12 +54,13 @@ class Category:
         """
         if len(self.lines) == 0:
             return len(self.name)+4
-        return max(len(self.name)+4, max([len(x) for x in self.lines]))
+        return min(NFO.NFO.max_width, max(len(self.name)+4, max([len(x) for x in self.lines])))
 
     def __repr__(self) -> str:
         """Category's __repr__ is made of 2 sections : A title and its content.
 
-        The title is made of one or more '=', a space, the Category's name, a space, and one or more '='.
+        If the Category's name is empty, then the title is only made of '='.
+        Otherwise, the title is made of one or more '=', a space, the Category's name, a space, and one or more '='.
         The number of '=' depends on the length of the NFO, there is at least one on each side.
         If the number of '=' on the left and on the right have to be different, there will be 1 more '=' on the left.
         It can occur for example if the width of the NFO is odd and the length of the Category's name is even.
@@ -60,14 +68,31 @@ class Category:
         Its content is made of the concatenation of all its lines' __repr__.
         """
         width = NFO.NFO.width()
-        if (width % 2 == 0 and len(self.name) % 2 == 0) or (width % 2 != 0 and len(self.name) % 2 != 0):
-            res = '{0} {1} {0}'.format((width - len(self.name) - 2) // 2 * '=', self.name)
+        if len(self.name) == 0:
+            res = width * '='
         else:
-            res = '{0} {1} {2}'.format((width - len(self.name)) // 2 * '=', self.name,
-                                       ((width - len(self.name)) // 2 - 1) * '=')
+            if (width % 2 == 0 and len(self.name) % 2 == 0) or (width % 2 != 0 and len(self.name) % 2 != 0):
+                res = '{0} {1} {0}'.format((width - len(self.name) - 2) // 2 * '=', self.name)
+            else:
+                res = '{0} {1} {2}'.format((width - len(self.name)) // 2 * '=', self.name,
+                                           ((width - len(self.name)) // 2 - 1) * '=')
         for line in self.lines:
             res = res + '\n' + str(line)
         return res
+
+    def set_name(self, new_name: str=None):
+        """Set the name of a Category."""
+        if new_name is None:
+            new_name = input('Enter a new name for "{}"\n> '.format(self.name))
+            if new_name == '':
+                return
+        if new_name[0] == '=':
+            new_name = new_name[1:]
+        self.name = new_name.replace('=', '')[:NFO.NFO.max_width-4]
+
+    def max_line_name_width(self):
+        """Return the maximum length of a Line's name in this Category."""
+        return max([len(x.name) for x in self.lines])
 
     def add_line(self, line: Line=None) -> None:
         """Add a Line to the Category."""
@@ -78,7 +103,7 @@ class Category:
             elif name[0] == '=':
                 name = name[1:]
             value = input('Enter the value of "{}"\n> '.format(name))
-            self.lines.append(Line(name, value))
+            self.lines.append(Line(self, name, value))
         elif isinstance(line, Line):
             self.lines.append(line)
         else:

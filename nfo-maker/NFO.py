@@ -34,6 +34,7 @@ class NFO(metaclass=MetaNFO):
     """The representation of the structure of a .nfo file."""
     name: str = None
     categories: typing.List[Category] = None
+    max_width: int = 80
     __path: Path = None
 
     @classmethod
@@ -98,22 +99,34 @@ class NFO(metaclass=MetaNFO):
 
     @classmethod
     def parse(cls, path: Path) -> None:
-        """Parse the file located at path to load its structure in NFO Maker."""
-        file = open(str(path.absolute()), 'r')
+        """Parse the file located at path to load its structure in NFO Maker.
+        The operation can fail if the file hasn't been generated with NFO Maker.
+        If a line is only made of the same character, then it does not give any information, so it is ignored,
+        except if it's made of '=', then it is considered as a new unnamed Category.
+        """
+        file = open(str(path.absolute()), 'r', encoding='utf8')
         nfo = None
         tmp_ctg = None
         for line in file:
-            if nfo is None:
-                nfo = NFO(line[:-1])
-                NFO.set_path(path)
-            elif (line == '\n' or line[0] == '=') and tmp_ctg is not None:
-                NFO.add_ctg(tmp_ctg)
-                tmp_ctg = None
-            elif line[0] == '=':
-                tmp_ctg = Category(re.findall(r"=* (.*) =*", line)[0])
-            elif re.match(r".* : .*", line):
-                name, value = re.findall(r"(.*) : (.*)", line)[0]
-                tmp_ctg.add_line(Line(name, value))
+            if not (len(line.strip()) > 0 and line.strip() == len(line.strip()) * line.strip()[0]):
+                if nfo is None:
+                    nfo = NFO(line[:-1].strip())
+                    NFO.set_path(path)
+                elif re.match(r".*=+ .* =+.*", line):
+                    if tmp_ctg is not None:
+                        NFO.add_ctg(tmp_ctg)
+                    tmp_ctg = Category(re.findall(r".*=+ (.*) =+.*", line)[0])
+                elif re.match(r".* : .*", line):
+                    name, value = re.findall(r"(.*) : (.*)", line)[0]
+                    name = name.rstrip()
+                    value = value.lstrip()
+                    tmp_ctg.add_line(Line(tmp_ctg, name, value))
+                elif line.strip() != '' and tmp_ctg is not None and tmp_ctg.contains_line():
+                    tmp_ctg.lines[-1].value += ' ' + line[:-1]
+            elif len(line.strip()) > 0 and line.strip() == len(line.strip()) * '=':
+                if tmp_ctg is not None:
+                    NFO.add_ctg(tmp_ctg)
+                tmp_ctg = Category(None)
         if tmp_ctg is not None:
             NFO.add_ctg(tmp_ctg)
 
@@ -145,7 +158,7 @@ class NFO(metaclass=MetaNFO):
             cls.__path = path
         if cls.__path.is_file() and input('This file exists, overwrite ? (Y/n)\n> ').upper() != 'Y':
             raise FileExistsError
-        out = open(str(cls.__path.absolute()), 'w+')
+        out = open(str(cls.__path.absolute()), 'w+', encoding='utf8')
         out.write(str(cls))
         out.close()
         print('.nfo written at {}'.format(cls.__path))
@@ -177,6 +190,8 @@ class NFO(metaclass=MetaNFO):
     @classmethod
     def width(cls) -> int:
         """Return the width of the NFO, determined by the largest Category in the NFO."""
+        if len(cls.categories) == 0:
+            return len(cls.name)
         return max([len(x) for x in cls.categories])
 
     @classmethod
@@ -252,13 +267,7 @@ class NFO(metaclass=MetaNFO):
         """
         if index is None:
             index = cls.sel_ctg()
-        name = cls.categories[index].name
-        if new_name is None:
-            new_name = input('Enter a new name for category "{}"\n> '.format(name))
-            if new_name != '':
-                cls.categories[index].name = new_name
-        else:
-            cls.categories[index].name = new_name
+        cls.categories[index].set_name(new_name)
 
     @classmethod
     def sel_ctg(cls, contains_line: bool=False, exclude: typing.List[Category]=()) -> int:

@@ -2,8 +2,11 @@ __pycache__
 .idea
 build
 dist
+img
 tests
 venv
 
 *.nfo
 *.spec
+
+/nfo-maker-cli*
