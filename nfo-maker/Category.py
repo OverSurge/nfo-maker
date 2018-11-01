@@ -105,6 +105,7 @@ class Category:
             value = input('Enter the value of "{}"\n> '.format(name))
             self.lines.append(Line(self, name, value))
         elif isinstance(line, Line):
+            line.set_category(self)
             self.lines.append(line)
         else:
             raise TypeError

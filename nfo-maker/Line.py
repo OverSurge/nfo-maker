@@ -59,6 +59,10 @@ class Line:
             return res[:-1]
         return one_line
 
+    def set_category(self, category: Category):
+        """Set the category of a Line."""
+        self.category = category
+
     def set_name(self, new_name: str=None):
         """Set the name of a Line (max 40 chars)."""
         if new_name is None:
