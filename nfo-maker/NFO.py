@@ -22,7 +22,13 @@ from Line import Line
 
 
 class MetaNFO(type):
-    """Metaclass used by NFO in order to have a class __repr__."""
+    """Metaclass used by NFO in order to have class __getitem__, __iter__ and __repr__."""
+    def __getitem__(cls, item):
+        return NFO.categories[item]
+
+    def __iter__(cls):
+        return NFO.categories.__iter__()
+
     def __repr__(cls) -> str:
         res = NFO.name
         for ctg in NFO.categories:
@@ -66,6 +72,10 @@ class NFO(metaclass=MetaNFO):
         """
         if path is None:
             folder = None
+            if cls.__path is not None:
+                if input('Do you want to load {} ? (Y/n)\n> '.format(cls.__path.absolute())).upper() == 'Y':
+                    folder = True
+                    path = cls.__path
             while folder is None:
                 folder = input('Enter the file\'s folder path (leave empty to search in {})\n> '
                                .format(Path().absolute()))
@@ -162,6 +172,16 @@ class NFO(metaclass=MetaNFO):
         out.write(str(cls))
         out.close()
         print('.nfo written at {}'.format(cls.__path))
+
+    @classmethod
+    def set_max_width(cls, width: int=None) -> None:
+        """Set the max width of the current NFO."""
+        if width is None:
+            width = int(input('Enter the new width (60 - 120) of this .nfo ({} before)\n> '.format(cls.max_width)))
+        if 60 < width < 120:
+            cls.max_width = width
+        else:
+            print('Out of range (60 - 120).')
 
     @classmethod
     def set_path(cls, path: Path=None) -> bool:

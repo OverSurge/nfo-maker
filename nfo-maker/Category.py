@@ -43,6 +43,12 @@ class Category:
             self.lines = lines
         Category.count += 1
 
+    def __getitem__(self, item):
+        return self.lines[item]
+
+    def __iter__(self):
+        return self.lines.__iter__()
+
     def __len__(self) -> int:
         """The length of a Category's title is the length of its name + 4 because there is at least 2 '=' and 2 spaces
         in a title.

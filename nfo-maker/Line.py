@@ -25,13 +25,14 @@ class Line:
         """Create a Line, defined by a category, a name and a value.
         :param category: Give the Category in which this Line is stored
         :param name: Should not start with an '=', max 40 chars
-        :param value:
+        :param value: Should not contain a ':'
         """
         self.category = category
         if len(name) > 0 and name[0] == '=':
             name = name[1:]
         name = name[:40]
         self.name = 'Line ' + str(Line.count) if name == '' else name
+        value = value.replace(':', '')
         self.value = 'Ø' if value == '' else value
         Line.count += 1
 
@@ -47,17 +48,16 @@ class Line:
         """If the line is larger than the width limit set in NFO, then it will be cut into multiple lines,
         without cutting words in half, otherwise it will be printed normally in one line.
         """
-        one_line = self.name.ljust(self.category.max_line_name_width()) + ' : ' + self.value
         if len(self) > NFO.NFO.max_width:
-            words = one_line.split()
-            res = ''
+            words = self.value.split()
+            res = self.name.ljust(self.category.max_line_name_width()) + ' : '
             while len(words) > 0:
                 if len(res.split('\n')[-1]) + len(words[0]) < NFO.NFO.max_width:
                     res += words.pop(0) + ' '
                 else:
                     res += '\n' + words.pop(0) + ' '
             return res[:-1]
-        return one_line
+        return self.name.ljust(self.category.max_line_name_width()) + ' : ' + self.value
 
     def set_category(self, category: Category):
         """Set the category of a Line."""
@@ -80,4 +80,4 @@ class Line:
             new_value = input('Enter a new value for "{}" ("{}" before)\n> '.format(self.name, self.value))
             if new_value == '':
                 return
-        self.value = new_value.replace('\n', '').replace('\r', '')
+        self.value = new_value.replace('\n', '').replace('\r', '').replace(':', '')
