@@ -37,7 +37,7 @@ def available_commands() -> typing.List[str]:
         res.append('mc')
     if NFO.contains_line():
         res.append('dl')
-        for ctg in NFO.categories:
+        for ctg in NFO:
             if len(ctg.lines) > 1:
                 res.append('ml')
                 break

@@ -31,7 +31,7 @@ class MetaNFO(type):
 
     def __repr__(cls) -> str:
         res = NFO.name
-        for ctg in NFO.categories:
+        for ctg in NFO:
             res = res + '\n\n' + str(ctg)
         return res + '\n'
 
@@ -132,7 +132,7 @@ class NFO(metaclass=MetaNFO):
                     value = value.lstrip()
                     tmp_ctg.add_line(Line(tmp_ctg, name, value))
                 elif line.strip() != '' and tmp_ctg is not None and tmp_ctg.contains_line():
-                    tmp_ctg.lines[-1].value += ' ' + line[:-1]
+                    tmp_ctg[-1].value += ' ' + line[:-1]
             elif len(line.strip()) > 0 and line.strip() == len(line.strip()) * '=':
                 if tmp_ctg is not None:
                     NFO.add_ctg(tmp_ctg)
@@ -168,10 +168,14 @@ class NFO(metaclass=MetaNFO):
             cls.__path = path
         if cls.__path.is_file() and input('This file exists, overwrite ? (Y/n)\n> ').upper() != 'Y':
             raise FileExistsError
-        out = open(str(cls.__path.absolute()), 'w+', encoding='utf8')
-        out.write(str(cls))
-        out.close()
-        print('.nfo written at {}'.format(cls.__path))
+        try:
+            out = open(str(cls.__path.absolute()), 'w+', encoding='utf8')
+            out.write(str(cls))
+            out.close()
+        except PermissionError:
+            print('This file is protected, writing cancelled !')
+        else:
+            print('.nfo written at {}'.format(cls.__path))
 
     @classmethod
     def set_max_width(cls, width: int=None) -> None:
@@ -212,7 +216,7 @@ class NFO(metaclass=MetaNFO):
         """Return the width of the NFO, determined by the largest Category in the NFO."""
         if len(cls.categories) == 0:
             return len(cls.name)
-        return max([len(x) for x in cls.categories])
+        return max([len(x) for x in cls])
 
     @classmethod
     def add_ctg(cls, category: Category=None) -> None:
@@ -230,7 +234,7 @@ class NFO(metaclass=MetaNFO):
         """
         if index is None:
             index = cls.sel_ctg()
-        name = cls.categories[index].name
+        name = cls[index].name
         if input('Are you sure to delete category "{}" ? (Y/n)\n> '.format(name)).upper() == 'Y':
             cls.categories.pop(index)
             print('Deleted category "{}"'.format(name))
@@ -243,7 +247,7 @@ class NFO(metaclass=MetaNFO):
         res = ''
         if categories is None:
             for i in range(len(cls.categories)):
-                res += '{}: {}\n'.format(str(i + 1).rjust(2), str(cls.categories[i]).split('\n', 1)[0])
+                res += '{}: {}\n'.format(str(i + 1).rjust(2), str(cls[i]).split('\n', 1)[0])
         else:
             for i in range(len(categories)):
                 res += '{}: {}\n'.format(str(i + 1).rjust(2), str(categories[i]).split('\n', 1)[0])
@@ -257,7 +261,7 @@ class NFO(metaclass=MetaNFO):
         :param direction: "up" or "down"
         """
         if len(cls.categories) == 2:
-            cls.categories[0], cls.categories[1] = cls.categories[1], cls.categories[0]
+            cls[0], cls[1] = cls[1], cls[0]
         else:
             index = cls.sel_ctg() if index is None else index
             if direction is None:
@@ -265,16 +269,16 @@ class NFO(metaclass=MetaNFO):
                     direction = input('Enter "up" or "down" to move category\n> ')
             if direction == 'up':
                 if index == 0:
-                    cls.categories.append(cls.categories[0])
+                    cls.categories.append(cls[0])
                     cls.categories.pop(0)
                 else:
-                    cls.categories[index - 1], cls.categories[index] = cls.categories[index], cls.categories[index - 1]
+                    cls[index - 1], cls[index] = cls[index], cls[index - 1]
             elif direction == 'down':
                 if index == len(cls.categories) - 1:
-                    cls.categories.insert(0, cls.categories[-1])
+                    cls.categories.insert(0, cls[-1])
                     cls.categories.pop()
                 else:
-                    cls.categories[index], cls.categories[index + 1] = cls.categories[index + 1], cls.categories[index]
+                    cls[index], cls[index + 1] = cls[index + 1], cls[index]
             else:
                 raise ValueError
 
@@ -287,17 +291,17 @@ class NFO(metaclass=MetaNFO):
         """
         if index is None:
             index = cls.sel_ctg()
-        cls.categories[index].set_name(new_name)
+        cls[index].set_name(new_name)
 
     @classmethod
     def sel_ctg(cls, contains_line: bool=False, exclude: typing.List[Category]=()) -> int:
         """Print all categories in the NFO and return the index of the Category the user chose.
         If there is only 1 Category, return 0."""
-        categories = [x for x in cls.categories if x not in exclude]
+        categories = [x for x in cls if x not in exclude]
         if len(categories) == 1:
             return cls.categories.index(categories[0])
         if contains_line:
-            categories = [x for x in cls.categories if x.contains_line() and x not in exclude]
+            categories = [x for x in cls if x.contains_line() and x not in exclude]
             if len(categories) == 1:
                 return 0
         print(cls.list_categories(categories))
@@ -312,12 +316,12 @@ class NFO(metaclass=MetaNFO):
         """Add a Line to a Category."""
         if index is None:
             index = cls.sel_ctg()
-        cls.categories[index].add_line(line)
+        cls[index].add_line(line)
 
     @classmethod
     def contains_line(cls) -> bool:
         """Return True if at least 1 Category contains a Line or more, otherwise False."""
-        for ctg in cls.categories:
+        for ctg in cls:
             if ctg.contains_line():
                 return True
         return False
@@ -327,14 +331,14 @@ class NFO(metaclass=MetaNFO):
         """Delete a Line in a Category."""
         if ctg_index is None:
             ctg_index = cls.sel_ctg()
-        cls.categories[ctg_index].del_line(line_index)
+        cls[ctg_index].del_line(line_index)
 
     @classmethod
     def move_line(cls, ctg_index: int=None, line_index: int=None, direction: str=None) -> None:
         """Move a Line inside a Category."""
         if ctg_index is None:
-            ctg_index = cls.sel_ctg(True, [x for x in cls.categories if len(x.lines) < 2])
-        cls.categories[ctg_index].move_line(line_index, direction)
+            ctg_index = cls.sel_ctg(True, [x for x in cls if len(x.lines) < 2])
+        cls[ctg_index].move_line(line_index, direction)
 
     @classmethod
     def move_line_to_ctg(cls, src_ctg_index: int=None, line_index: int=None, out_ctg_index: int=None) -> None:
@@ -345,16 +349,16 @@ class NFO(metaclass=MetaNFO):
         :param out_ctg_index: The index of the Category where to move the Line
         """
         if src_ctg_index is None or line_index is None or out_ctg_index is None:
-            cls.list_categories([x for x in cls.categories if x.contains_line()])
-            src_ctg_index = cls.sel_ctg(True, [x for x in cls.categories if not x.contains_line()])
-            line_index = cls.categories[src_ctg_index].sel_line()
-            out_ctg_index = cls.sel_ctg(False, [cls.categories[src_ctg_index]])
-        cls.categories[out_ctg_index].add_line(cls.categories[src_ctg_index].lines[line_index])
-        cls.categories[src_ctg_index].del_line(line_index, True)
+            cls.list_categories([x for x in cls if x.contains_line()])
+            src_ctg_index = cls.sel_ctg(True, [x for x in cls if not x.contains_line()])
+            line_index = cls[src_ctg_index].sel_line()
+            out_ctg_index = cls.sel_ctg(False, [cls[src_ctg_index]])
+        cls[out_ctg_index].add_line(cls[src_ctg_index][line_index])
+        cls[src_ctg_index].del_line(line_index, True)
 
     @classmethod
     def ren_line(cls, ctg_index: int=None, line_index: int=None, new_name: str=None, new_value: str=None) -> None:
         """Rename a Line in a Category."""
         if ctg_index is None:
             ctg_index = cls.sel_ctg()
-        cls.categories[ctg_index].ren_line(line_index, new_name, new_value)
+        cls[ctg_index].ren_line(line_index, new_name, new_value)

@@ -20,7 +20,7 @@ import os
 import commands
 from NFO import NFO
 
-VERSION = '1.2.2'
+VERSION = '1.2.3'
 
 
 def cls() -> None:

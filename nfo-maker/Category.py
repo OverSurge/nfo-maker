@@ -60,7 +60,7 @@ class Category:
         """
         if len(self.lines) == 0:
             return len(self.name)+4
-        return min(NFO.NFO.max_width, max(len(self.name)+4, max([len(x) for x in self.lines])))
+        return min(NFO.NFO.max_width, max(len(self.name)+4, max([len(x) for x in self])))
 
     def __repr__(self) -> str:
         """Category's __repr__ is made of 2 sections : A title and its content.
@@ -82,7 +82,7 @@ class Category:
             else:
                 res = '{0} {1} {2}'.format((width - len(self.name)) // 2 * '=', self.name,
                                            ((width - len(self.name)) // 2 - 1) * '=')
-        for line in self.lines:
+        for line in self:
             res = res + '\n' + str(line)
         return res
 
@@ -98,7 +98,7 @@ class Category:
 
     def max_line_name_width(self):
         """Return the maximum length of a Line's name in this Category."""
-        return max([len(x.name) for x in self.lines])
+        return max([len(x.name) for x in self])
 
     def add_line(self, line: Line=None) -> None:
         """Add a Line to the Category."""
@@ -128,7 +128,7 @@ class Category:
         """
         if index is None:
             index = self.sel_line()
-        name = self.lines[index].name
+        name = self[index].name
         if force:
             self.lines.pop(index)
         elif input('Are you sure to delete line "{}" ? (Y/n)\n> '.format(name)).upper() == 'Y':
@@ -141,7 +141,7 @@ class Category:
         """Return a string containing the list of all lines in the Category, numbered from 1 for readability."""
         res = ''
         for i in range(len(self.lines)):
-            res += '{}: {}\n'.format(str(i + 1).rjust(2), str(self.lines[i]).split('\n', 1)[0])
+            res += '{}: {}\n'.format(str(i + 1).rjust(2), str(self[i]).split('\n', 1)[0])
         return res
 
     def move_line(self, index: int=None, direction: str=None) -> None:
@@ -151,7 +151,7 @@ class Category:
         :param direction: "up" or "down"
         """
         if len(self.lines) == 2:
-            self.lines[0], self.lines[1] = self.lines[1], self.lines[0]
+            self[0], self[1] = self[1], self[0]
         else:
             index = self.sel_line() if index is None else index
             if direction is None:
@@ -159,16 +159,16 @@ class Category:
                     direction = input('Enter "up" or "down" to move line\n> ')
             if direction == 'up':
                 if index == 0:
-                    self.lines.append(self.lines[0])
+                    self.lines.append(self[0])
                     self.lines.pop(0)
                 else:
-                    self.lines[index-1], self.lines[index] = self.lines[index], self.lines[index-1]
+                    self[index-1], self[index] = self[index], self[index-1]
             elif direction == 'down':
                 if index == len(self.lines) - 1:
                     self.lines.insert(0, self.lines[-1])
                     self.lines.pop()
                 else:
-                    self.lines[index], self.lines[index+1] = self.lines[index+1], self.lines[index]
+                    self[index], self[index+1] = self[index+1], self[index]
             else:
                 raise ValueError
 
@@ -181,8 +181,8 @@ class Category:
         """
         if index is None:
             index = self.sel_line()
-        self.lines[index].set_name(new_name)
-        self.lines[index].set_value(new_value)
+        self[index].set_name(new_name)
+        self[index].set_value(new_value)
 
     def sel_line(self) -> int:
         """Print all lines in the Category and return the index of the Line the user chose.
