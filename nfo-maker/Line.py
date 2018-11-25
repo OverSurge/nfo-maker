@@ -50,14 +50,20 @@ class Line:
         """
         if len(self) > NFO.NFO.max_width:
             words = self.value.split()
-            res = self.name.ljust(self.category.max_line_name_width()) + ' : '
+            if NFO.NFO.vertical_align:
+                res = self.name.ljust(self.category.max_line_name_width()) + ' : '
+            else:
+                res = self.name + ' : '
             while len(words) > 0:
                 if len(res.split('\n')[-1]) + len(words[0]) < NFO.NFO.max_width:
                     res += words.pop(0) + ' '
                 else:
                     res += '\n' + words.pop(0) + ' '
             return res[:-1]
-        return self.name.ljust(self.category.max_line_name_width()) + ' : ' + self.value
+        if NFO.NFO.vertical_align:
+            return self.name.ljust(self.category.max_line_name_width()) + ' : ' + self.value
+        else:
+            return self.name + ' : ' + self.value
 
     def set_category(self, category: Category):
         """Set the category of a Line."""

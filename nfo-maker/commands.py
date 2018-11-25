@@ -18,7 +18,7 @@ import typing
 from NFO import NFO
 
 commands = [{'h': 'show this Help / command list', 'q': 'Quit', 'r': 'Rename .nfo', 'p': 'Print .nfo', 's': 'Save .nfo',
-            'l': 'Load .nfo', 'w': 'set the maximum Width of this .nfo'},
+            'l': 'Load .nfo', 'w': 'set the maximum Width of this .nfo', 'va': 'enable or disable Vertical Alignment'},
             {'ac': 'Add a Category', 'dc': 'Delete a Category', 'mc': 'Move a Category', 'rc': 'Rename a Category'},
             {'al': 'Add a Line to a category', 'dl': 'Delete a Line', 'ml': 'Move a Line inside a category',
             'mlc': 'Move a Line to another Category', 'rl': 'Rename a Line\'s name and/or value'}]
@@ -26,10 +26,9 @@ commands = [{'h': 'show this Help / command list', 'q': 'Quit', 'r': 'Rename .nf
 
 def available_commands() -> typing.List[str]:
     """Return which actions are possible given the current NFO.
-
     :return: The list of action shortcuts
     """
-    res = ['h', 'q', 'r', 'p', 's', 'l', 'w', 'ac']
+    res = ['h', 'q', 'r', 'p', 's', 'l', 'w', 'va', 'ac']
     nb_categories = len(NFO.categories)
     if nb_categories > 0:
         res.extend(['dc', 'rc', 'al'])

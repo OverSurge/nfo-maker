@@ -20,7 +20,7 @@ import os
 import commands
 from NFO import NFO
 
-VERSION = '1.2.3'
+VERSION = '1.3.0'
 
 
 def cls() -> None:
@@ -79,6 +79,9 @@ def main() -> None:
                     elif action == 'w':
                         NFO.set_max_width()
 
+                    elif action == 'va':
+                        NFO.set_vertical_align()
+
                     elif action == 'ac':
                         NFO.add_ctg()
 
@@ -106,7 +109,7 @@ def main() -> None:
                     elif action == 'rl':
                         NFO.ren_line()
 
-                    if action in ['r', 'l', 'w', 'ac', 'dc', 'mc', 'rc', 'al', 'dl', 'ml', 'mlc', 'rl']:
+                    if action in ['r', 'l', 'w', 'va', 'ac', 'dc', 'mc', 'rc', 'al', 'dl', 'ml', 'mlc', 'rl']:
                         cls()
                         print(NFO)
                         commands.print_commands()

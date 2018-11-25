@@ -42,6 +42,7 @@ class NFO(metaclass=MetaNFO):
     categories: typing.List[Category] = None
     max_width: int = 80
     __path: Path = None
+    vertical_align = True
 
     @classmethod
     def __init__(cls, name: str=None, categories: typing.List[Category]=None) -> None:
@@ -182,10 +183,18 @@ class NFO(metaclass=MetaNFO):
         """Set the max width of the current NFO."""
         if width is None:
             width = int(input('Enter the new width (60 - 120) of this .nfo ({} before)\n> '.format(cls.max_width)))
-        if 60 < width < 120:
+        if 60 <= width <= 120:
             cls.max_width = width
         else:
             print('Out of range (60 - 120).')
+
+    @classmethod
+    def set_vertical_align(cls, mode: bool = None) -> None:
+        """Set the vertical alignment of the current NFO."""
+        if mode is None:
+            cls.vertical_align = input('Do you want to enable vertical alignment ? (Y/n)\n> ').upper() == "Y"
+        else:
+            cls.vertical_align = mode
 
     @classmethod
     def set_path(cls, path: Path=None) -> bool:
